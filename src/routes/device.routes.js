@@ -64,6 +64,45 @@ router.patch("/:id/toggle", auth, async (req, res) => {
   }
 });
 
+// PATCH /api/devices/:id/ac-settings - Update AC temperature and mode
+router.patch("/:id/ac-settings", auth, async (req, res) => {
+  try {
+    console.log("PATCH /api/devices/:id/ac-settings - ID:", req.params.id);
+    
+    const device = await Device.findOne({ _id: req.params.id, user: req.userId });
+
+    if (!device) {
+      console.log("Device not found:", req.params.id);
+      return res.status(404).send({ success: false, message: "Device not found" });
+    }
+
+    if (device.type !== "ac") {
+      console.log("Not an AC device:", device.type);
+      return res.status(400).send({ success: false, message: "This is not an AC device" });
+    }
+
+    const { temperature, mode } = req.body;
+
+    if (temperature) device.settings.temperature = temperature;
+    if (mode) device.settings.mode = mode;
+
+    await device.save();
+
+    await Log.create({
+      user: req.userId,
+      device: device._id,
+      action: "AC_SETTINGS_CHANGED",
+      details: { temperature, mode },
+    });
+
+    console.log("AC settings updated:", device.name, "Temp:", temperature, "Mode:", mode);
+    res.send({ success: true, device });
+  } catch (err) {
+    console.log("AC SETTINGS ERROR:", err.message);
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
 // DELETE /api/devices/:id
 router.delete("/:id", auth, async (req, res) => {
   try {
@@ -88,3 +127,4 @@ router.delete("/:id", auth, async (req, res) => {
 });
 
 module.exports = router;
+ 

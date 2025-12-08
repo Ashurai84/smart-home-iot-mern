@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const deviceSchema = mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
-    type: { type: String, required: true, enum: ["light", "ac", "fan", "sensor", "tv", "door"] },
-    room: { type: String, required: true, trim: true },
+    name: { type: String, required: true },
+    type: { type: String, required: true },
+    room: { type: String, required: true },
     status: { type: Boolean, default: false },
-    settings: { type: Object, default: {} },
+    temperature: { type: Number, default: 24 }, // For AC devices
+    mode: { type: String, default: "cool" }, // For AC devices
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
