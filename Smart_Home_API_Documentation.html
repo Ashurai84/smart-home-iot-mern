@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home IoT Server - Code Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        .cover-page {
+            text-align: center;
+            padding: 100px 0;
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 50px;
+        }
+        .cover-page h1 {
+            font-size: 42px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .cover-page .subtitle {
+            font-size: 22px;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+        .cover-page .author {
+            font-size: 18px;
+            color: #34495e;
+        }
+        .cover-page .date {
+            font-size: 14px;
+            color: #95a5a6;
+            margin-top: 10px;
+        }
+        h1 { font-size: 28px; color: #2c3e50; margin: 40px 0 20px 0; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { font-size: 22px; color: #34495e; margin: 30px 0 15px 0; }
+        h3 { font-size: 18px; color: #2980b9; margin: 20px 0 10px 0; }
+        p { margin: 10px 0; text-align: justify; }
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .endpoint-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .method { font-weight: bold; padding: 3px 8px; border-radius: 4px; margin-right: 10px; }
+        .get { background: #27ae60; color: white; }
+        .post { background: #f39c12; color: white; }
+        .patch { background: #9b59b6; color: white; }
+        .delete { background: #e74c3c; color: white; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th { background: #3498db; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .toc { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .toc ul { list-style: none; padding-left: 20px; }
+        .toc li { margin: 8px 0; }
+        .page-break { page-break-after: always; }
+        .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="cover-page">
+        <h1>🏠 Smart Home IoT Server</h1>
+        <p class="subtitle">Backend API Documentation & Code Review</p>
+        <p class="author">Developed by: Ashutosh Rai</p>
+        <p class="date">December 2024</p>
+        <p style="margin-top: 50px; color: #7f8c8d;">
+            Node.js | Express.js | MongoDB | JWT Authentication
+        </p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li>1. Project Overview</li>
+            <li>2. Project Structure</li>
+            <li>3. Technologies Used</li>
+            <li>4. Database Models</li>
+            <li>5. Authentication System</li>
+            <li>6. API Endpoints</li>
+            <li>7. Middleware</li>
+            <li>8. Complete Source Code</li>
+        </ul>
+    </div>
+
+    <h1>1. Project Overview</h1>
+    <p>
+        This is a Smart Home IoT Server built using Node.js and Express.js framework. The server provides a RESTful API 
+        for managing smart home devices like lights, fans, air conditioners, TVs, sensors, and door locks. Users can 
+        register, login, add devices, control them remotely, and view activity logs.
+    </p>
+    <p>
+        The application uses MongoDB as the database for storing user information, device data, and activity logs. 
+        JWT (JSON Web Token) is used for secure authentication, ensuring that only authorized users can access and 
+        control their devices.
+    </p>
+
+    <h1>2. Project Structure</h1>
+    <pre>
+smart-home-node-server/
+├── package.json
+├── README.md
+├── .env
+└── src/
+    ├── index.js              (Main entry point)
+    ├── middleware/
+    │   └── auth.js           (JWT authentication middleware)
+    ├── models/
+    │   ├── User.js           (User schema)
+    │   ├── Device.js         (Device schema)
+    │   └── Log.js            (Activity log schema)
+    └── routes/
+        ├── index.js          (Route aggregator)
+        ├── auth.routes.js    (Authentication routes)
+        ├── device.routes.js  (Device management routes)
+        └── log.routes.js     (Log routes)
+    </pre>
+
+    <h1>3. Technologies Used</h1>
+    <table>
+        <tr><th>Technology</th><th>Purpose</th><th>Version</th></tr>
+        <tr><td>Node.js</td><td>Runtime Environment</td><td>Latest</td></tr>
+        <tr><td>Express.js</td><td>Web Framework</td><td>4.22.1</td></tr>
+        <tr><td>MongoDB</td><td>Database</td><td>Latest</td></tr>
+        <tr><td>Mongoose</td><td>MongoDB ODM</td><td>8.0.0</td></tr>
+        <tr><td>JWT</td><td>Authentication Tokens</td><td>9.0.3</td></tr>
+        <tr><td>bcrypt</td><td>Password Hashing</td><td>6.0.0</td></tr>
+        <tr><td>cors</td><td>Cross-Origin Resource Sharing</td><td>2.8.5</td></tr>
+        <tr><td>dotenv</td><td>Environment Variables</td><td>16.3.1</td></tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h1>4. Database Models</h1>
+
+    <h2>4.1 User Model</h2>
+    <p>The User model stores user registration information including name, email, and encrypted password.</p>
+    <pre>
+const mongoose = require("mongoose");
+
+const userSchema = mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true, minlength: 6 },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("User", userSchema);
+    </pre>
+
+    <h2>4.2 Device Model</h2>
+    <p>The Device model represents smart home devices. Each device belongs to a user and includes properties like name, type, room, status, and AC-specific settings.</p>
+    <pre>
+const mongoose = require("mongoose");
+
+const deviceSchema = mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    type: { type: String, required: true },
+    room: { type: String, required: true },
+    status: { type: Boolean, default: false },
+    temperature: { type: Number, default: 24 },
+    mode: { type: String, default: "cool" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Device", deviceSchema);
+    </pre>
+
+    <h2>4.3 Log Model</h2>
+    <p>The Log model tracks all device activities including turning devices on/off and changing settings.</p>
+    <pre>
+const mongoose = require("mongoose");
+
+const logSchema = mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    device: { type: mongoose.Schema.Types.ObjectId, ref: "Device", required: true },
+    action: { type: String, required: true },
+    details: { type: Object, default: {} },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Log", logSchema);
+    </pre>
+
+    <div class="page-break"></div>
+
+    <h1>5. Authentication System</h1>
+    <p>
+        The authentication system uses JWT tokens for secure user authentication. When a user logs in successfully, 
+        they receive a JWT token which must be included in subsequent API requests.
+    </p>
+
+    <h2>5.1 Auth Middleware</h2>
+    <p>This middleware verifies the JWT token from the Authorization header and extracts the user ID for protected routes.</p>
+    <pre>
+const jwt = require("jsonwebtoken");
+
+const auth = (req, res, next) => {
+  try {
+    let token = req.headers.authorization;
+
+    if (!token) {
+      return res.status(401).send({ message: "No token provided" });
+    }
+
+    let decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.userid;
+    next();
+  } catch (err) {
+    res.status(401).send({ message: "Invalid token" });
+  }
+};
+
+module.exports = auth;
+    </pre>
+
+    <div class="note">
+        <strong>Note:</strong> The token should be sent directly in the Authorization header without the "Bearer" prefix.
+    </div>
+
+    <h1>6. API Endpoints</h1>
+
+    <h2>6.1 Authentication Endpoints</h2>
+
+    <div class="endpoint-box">
+        <p><span class="method post">POST</span><code>/api/auth/register</code></p>
+        <p>Register a new user account</p>
+        <p><strong>Request Body:</strong></p>
+        <pre>{ "name": "John Doe", "email": "john@example.com", "password": "password123" }</pre>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "message": "User created" }</pre>
+    </div>
+
+    <div class="endpoint-box">
+        <p><span class="method post">POST</span><code>/api/auth/login</code></p>
+        <p>Login and receive JWT token</p>
+        <p><strong>Request Body:</strong></p>
+        <pre>{ "email": "john@example.com", "password": "password123" }</pre>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "message": "Login verified", "token": "eyJhbGciOiJIUzI1..." }</pre>
+    </div>
+
+    <h2>6.2 Device Endpoints</h2>
+
+    <div class="endpoint-box">
+        <p><span class="method get">GET</span><code>/api/devices</code></p>
+        <p>Get all devices for the authenticated user</p>
+        <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "devices": [...] }</pre>
+    </div>
+
+    <div class="endpoint-box">
+        <p><span class="method post">POST</span><code>/api/devices</code></p>
+        <p>Create a new device</p>
+        <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
+        <p><strong>Request Body:</strong></p>
+        <pre>{ "name": "Living Room AC", "type": "ac", "room": "Living Room" }</pre>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "message": "Device created", "device": {...} }</pre>
+    </div>
+
+    <div class="endpoint-box">
+        <p><span class="method patch">PATCH</span><code>/api/devices/:id/toggle</code></p>
+        <p>Toggle device on/off status</p>
+        <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "device": {...} }</pre>
+    </div>
+
+    <div class="endpoint-box">
+        <p><span class="method patch">PATCH</span><code>/api/devices/:id/ac-settings</code></p>
+        <p>Update AC temperature and mode</p>
+        <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
+        <p><strong>Request Body:</strong></p>
+        <pre>{ "temperature": 22, "mode": "cool" }</pre>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "device": {...} }</pre>
+    </div>
+
+    <div class="endpoint-box">
+        <p><span class="method delete">DELETE</span><code>/api/devices/:id</code></p>
+        <p>Delete a device</p>
+        <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "message": "Device deleted" }</pre>
+    </div>
+
+    <h2>6.3 Log Endpoints</h2>
+
+    <div class="endpoint-box">
+        <p><span class="method get">GET</span><code>/api/logs</code></p>
+        <p>Get all activity logs for the authenticated user</p>
+        <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "logs": [...] }</pre>
+    </div>
+
+    <div class="endpoint-box">
+        <p><span class="method get">GET</span><code>/api/logs/:deviceId</code></p>
+        <p>Get logs for a specific device</p>
+        <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
+        <p><strong>Response:</strong></p>
+        <pre>{ "success": true, "logs": [...] }</pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h1>7. Main Server File</h1>
+    <p>The main entry point of the application that sets up Express server, connects to MongoDB, and configures routes.</p>
+    <pre>
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+const PORT = process.env.PORT || 5001;
+const DB_URL = process.env.DB_URL;
+const DB_NAME = process.env.DB_NAME;
+
+mongoose
+  .connect(DB_URL + DB_NAME)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.log("MongoDB error:", err.message));
+
+app.get("/api/health", (req, res) => {
+  res.json({ message: "Smart Home API is running" });
+});
+
+const routes = require("./routes");
+app.use("/api", routes);
+
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: "Route not found" });
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).json({ success: false, message: err.message });
+});
+
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
+});
+    </pre>
+
+    <div class="page-break"></div>
+
+    <h1>8. Complete Route Files</h1>
+
+    <h2>8.1 Authentication Routes</h2>
+    <pre>
+const express = require("express");
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const router = express.Router();
+
+router.post("/register", async (req, res) => {
+  try {
+    let user = req.body;
+    const hash = await bcrypt.hash(user.password, 10);
+    user.password = hash;
+
+    await User.create(user);
+    res.status(201).send({ success: true, message: "User created" });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+router.post("/login", async (req, res) => {
+  try {
+    let userCred = req.body;
+    let user = await User.findOne({ email: userCred.email });
+
+    if (user) {
+      let match = await bcrypt.compare(userCred.password, user.password);
+
+      if (match) {
+        let token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET);
+        res.send({ success: true, message: "Login verified", token });
+      } else {
+        res.status(401).send({ success: false, message: "Password is wrong" });
+      }
+    } else {
+      res.status(404).send({ success: false, message: "User not found" });
+    }
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+module.exports = router;
+    </pre>
+
+    <h2>8.2 Device Routes</h2>
+    <pre>
+const express = require("express");
+const Device = require("../models/Device");
+const Log = require("../models/Log");
+const auth = require("../middleware/auth");
+
+const router = express.Router();
+
+router.get("/", auth, async (req, res) => {
+  try {
+    const devices = await Device.find({ user: req.userId });
+    res.send({ success: true, devices });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+router.post("/", auth, async (req, res) => {
+  try {
+    const device = { ...req.body, user: req.userId };
+    const newDevice = await Device.create(device);
+    res.status(201).send({ success: true, message: "Device created", device: newDevice });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+router.patch("/:id/toggle", auth, async (req, res) => {
+  try {
+    const device = await Device.findOne({ _id: req.params.id, user: req.userId });
+
+    if (!device) {
+      return res.status(404).send({ success: false, message: "Device not found" });
+    }
+
+    device.status = !device.status;
+    await device.save();
+
+    await Log.create({
+      user: req.userId,
+      device: device._id,
+      action: device.status ? "TURN_ON" : "TURN_OFF",
+    });
+
+    res.send({ success: true, device });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+router.patch("/:id/ac-settings", auth, async (req, res) => {
+  try {
+    const device = await Device.findOne({ _id: req.params.id, user: req.userId });
+
+    if (!device) {
+      return res.status(404).send({ success: false, message: "Device not found" });
+    }
+
+    if (device.type !== "ac") {
+      return res.status(400).send({ success: false, message: "This is not an AC device" });
+    }
+
+    const { temperature, mode } = req.body;
+
+    if (temperature) device.temperature = temperature;
+    if (mode) device.mode = mode;
+
+    await device.save();
+
+    await Log.create({
+      user: req.userId,
+      device: device._id,
+      action: "AC_SETTINGS_CHANGED",
+      details: { temperature, mode },
+    });
+
+    res.send({ success: true, device });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const deleted = await Device.findOneAndDelete({
+      _id: req.params.id,
+      user: req.userId,
+    });
+
+    if (!deleted) {
+      return res.status(404).send({ success: false, message: "Device not found" });
+    }
+
+    res.send({ success: true, message: "Device deleted" });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+module.exports = router;
+    </pre>
+
+    <h2>8.3 Log Routes</h2>
+    <pre>
+const express = require("express");
+const Log = require("../models/Log");
+const auth = require("../middleware/auth");
+
+const router = express.Router();
+
+router.get("/", auth, async (req, res) => {
+  try {
+    let logs = await Log.find({ user: req.userId })
+      .populate("device", "name type")
+      .sort({ createdAt: -1 });
+    
+    res.send({ success: true, logs });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+router.get("/:deviceId", auth, async (req, res) => {
+  try {
+    let logs = await Log.find({ 
+      user: req.userId, 
+      device: req.params.deviceId 
+    }).sort({ createdAt: -1 });
+    
+    res.send({ success: true, logs });
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Server error" });
+  }
+});
+
+module.exports = router;
+    </pre>
+
+    <div class="page-break"></div>
+
+    <h1>9. Environment Configuration</h1>
+    <p>Create a <code>.env</code> file in the root directory with the following variables:</p>
+    <pre>
+PORT=5001
+DB_URL=mongodb://localhost:27017/
+DB_NAME=smart_home_db
+JWT_SECRET=your_secret_key_here
+    </pre>
+
+    <h1>10. How to Run</h1>
+    <table>
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td><code>npm install</code></td><td>Install all dependencies</td></tr>
+        <tr><td><code>npm run dev</code></td><td>Run in development mode with nodemon</td></tr>
+        <tr><td><code>npm start</code></td><td>Run in production mode</td></tr>
+    </table>
+
+    <div style="text-align: center; margin-top: 60px; padding-top: 30px; border-top: 2px solid #3498db;">
+        <p style="color: #7f8c8d;">Smart Home IoT Server Documentation</p>
+        <p style="color: #95a5a6; font-size: 12px;">© 2024 Ashutosh Rai. All rights reserved.</p>
+    </div>
+
+</body>
+</html>

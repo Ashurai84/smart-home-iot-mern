@@ -15,6 +15,6 @@ const auth = (req, res, next) => {
     console.log("JWT ERROR:", err.message);
     res.status(401).send({ message: "Invalid token" });
   }
-};
+}; 
 
 module.exports = auth;

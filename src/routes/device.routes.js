@@ -83,8 +83,8 @@ router.patch("/:id/ac-settings", auth, async (req, res) => {
 
     const { temperature, mode } = req.body;
 
-    if (temperature) device.settings.temperature = temperature;
-    if (mode) device.settings.mode = mode;
+    if (temperature) device.temperature = temperature;
+    if (mode) device.mode = mode;
 
     await device.save();
 
