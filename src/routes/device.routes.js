@@ -25,6 +25,13 @@ router.post("/", auth, async (req, res) => {
     console.log("POST /api/devices - Name:", req.body.name);
     
     const device = { ...req.body, user: req.userId };
+    
+    // Add temperature and mode only for AC devices
+    if (device.type === "ac") {
+      device.temperature = device.temperature || 24;
+      device.mode = device.mode || "cool";
+    }
+    
     const newDevice = await Device.create(device);
 
     console.log("Device created:", newDevice.name);
@@ -47,13 +54,13 @@ router.patch("/:id/toggle", auth, async (req, res) => {
       return res.status(404).send({ success: false, message: "Device not found" });
     }
 
-    device.status = !device.status;
+    device.status = device.status === "on" ? "off" : "on";
     await device.save();
 
     await Log.create({
       user: req.userId,
       device: device._id,
-      action: device.status ? "TURN_ON" : "TURN_OFF",
+      action: device.status === "on" ? "TURN_ON" : "TURN_OFF",
     });
 
     console.log("Device toggled:", device.name, "Status:", device.status);
@@ -79,6 +86,11 @@ router.patch("/:id/ac-settings", auth, async (req, res) => {
     if (device.type !== "ac") {
       console.log("Not an AC device:", device.type);
       return res.status(400).send({ success: false, message: "This is not an AC device" });
+    }
+
+    if (device.status === "off") {
+      console.log("AC is OFF, cannot change settings");
+      return res.status(400).send({ success: false, message: "Turn on the AC first to change settings" });
     }
 
     const { temperature, mode } = req.body;

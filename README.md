@@ -2,6 +2,17 @@
 
 A complete backend API for Smart Home Automation built with Node.js, Express, and MongoDB.
 
+
+## Live Deployment
+
+This API is deployed and running live on Render:
+
+**Base URL:** [https://smart-home-iot-mern-api.onrender.com](https://smart-home-iot-mern-api.onrender.com)
+
+You can test the health endpoint here: [https://smart-home-iot-mern-api.onrender.com/api/health](https://smart-home-iot-mern-api.onrender.com/api/health)
+
+---
+
 ## Project Overview
 
 This project is a **Smart Home Automation System** that allows users to control smart home devices like lights, fans, AC units, and sensors through a web dashboard. Users can toggle devices ON/OFF, view activity logs, and manage their smart home remotely.

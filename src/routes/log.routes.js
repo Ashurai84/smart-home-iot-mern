@@ -10,8 +10,7 @@ router.get("/", auth, async (req, res) => {
     console.log("GET /api/logs - User:", req.userId);
     
     let logs = await Log.find({ user: req.userId })
-      .populate("device", "name type")
-      .sort({ createdAt: -1 });
+      .populate("device", "name type").sort({ createdAt: -1 });
     
     console.log("Logs found:", logs.length);
     res.send({ success: true, logs });

@@ -97,7 +97,7 @@
         <h1>🏠 Smart Home IoT Server</h1>
         <p class="subtitle">Backend API Documentation & Code Review</p>
         <p class="author">Developed by: Ashutosh Rai</p>
-        <p class="date">December 2024</p>
+        <p class="date">December 2025</p>
         <p style="margin-top: 50px; color: #7f8c8d;">
             Node.js | Express.js | MongoDB | JWT Authentication
         </p>
@@ -187,7 +187,7 @@ module.exports = mongoose.model("User", userSchema);
     </pre>
 
     <h2>4.2 Device Model</h2>
-    <p>The Device model represents smart home devices. Each device belongs to a user and includes properties like name, type, room, status, and AC-specific settings.</p>
+    <p>The Device model represents smart home devices. Each device belongs to a user. Temperature and mode fields are only added for AC type devices.</p>
     <pre>
 const mongoose = require("mongoose");
 
@@ -196,9 +196,9 @@ const deviceSchema = mongoose.Schema(
     name: { type: String, required: true },
     type: { type: String, required: true },
     room: { type: String, required: true },
-    status: { type: Boolean, default: false },
-    temperature: { type: Number, default: 24 },
-    mode: { type: String, default: "cool" },
+    status: { type: String, default: "off" },
+    temperature: { type: Number },
+    mode: { type: String },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
@@ -206,6 +206,9 @@ const deviceSchema = mongoose.Schema(
 
 module.exports = mongoose.model("Device", deviceSchema);
     </pre>
+    <div class="note">
+        <strong>Note:</strong> The <code>temperature</code> and <code>mode</code> fields are only added when creating an AC device. Other devices (light, fan, tv, etc.) will not have these fields.
+    </div>
 
     <h2>4.3 Log Model</h2>
     <p>The Log model tracks all device activities including turning devices on/off and changing settings.</p>
@@ -263,6 +266,37 @@ module.exports = auth;
 
     <h1>6. API Endpoints</h1>
 
+    <h2>📋 Complete API URL List</h2>
+    <table>
+        <tr><th>#</th><th>Method</th><th>URL</th><th>Description</th><th>Auth Required</th></tr>
+        <tr><td>1</td><td><span class="method get">GET</span></td><td><code>/api/health</code></td><td>Health check</td><td>No</td></tr>
+        <tr><td>2</td><td><span class="method post">POST</span></td><td><code>/api/auth/register</code></td><td>Register new user</td><td>No</td></tr>
+        <tr><td>3</td><td><span class="method post">POST</span></td><td><code>/api/auth/login</code></td><td>Login & get token</td><td>No</td></tr>
+        <tr><td>4</td><td><span class="method get">GET</span></td><td><code>/api/devices</code></td><td>Get all devices</td><td>Yes</td></tr>
+        <tr><td>5</td><td><span class="method post">POST</span></td><td><code>/api/devices</code></td><td>Create new device</td><td>Yes</td></tr>
+        <tr><td>6</td><td><span class="method patch">PATCH</span></td><td><code>/api/devices/:id/toggle</code></td><td>Toggle device on/off</td><td>Yes</td></tr>
+        <tr><td>7</td><td><span class="method patch">PATCH</span></td><td><code>/api/devices/:id/ac-settings</code></td><td>Update AC temp & mode</td><td>Yes</td></tr>
+        <tr><td>8</td><td><span class="method delete">DELETE</span></td><td><code>/api/devices/:id</code></td><td>Delete a device</td><td>Yes</td></tr>
+        <tr><td>9</td><td><span class="method get">GET</span></td><td><code>/api/logs</code></td><td>Get all activity logs</td><td>Yes</td></tr>
+        <tr><td>10</td><td><span class="method get">GET</span></td><td><code>/api/logs/:deviceId</code></td><td>Get logs for specific device</td><td>Yes</td></tr>
+    </table>
+
+    <h3>Base URL</h3>
+    <pre>https://smart-home-iot-mern-api.onrender.com</pre>
+
+    <h3>Example Full URLs</h3>
+    <pre>
+  https://smart-home-iot-mern-api.onrender.com/api/health
+  https://smart-home-iot-mern-api.onrender.com/api/auth/register
+  https://smart-home-iot-mern-api.onrender.com/api/auth/login
+  https://smart-home-iot-mern-api.onrender.com/api/devices
+  https://smart-home-iot-mern-api.onrender.com/api/devices/6938364ad1ae47447f9298cf/toggle
+  https://smart-home-iot-mern-api.onrender.com/api/devices/6938364ad1ae47447f9298cf/ac-settings
+  https://smart-home-iot-mern-api.onrender.com/api/devices/6938364ad1ae47447f9298cf
+  https://smart-home-iot-mern-api.onrender.com/api/logs
+  https://smart-home-iot-mern-api.onrender.com/api/logs/6938364ad1ae47447f9298cf
+    </pre>
+
     <h2>6.1 Authentication Endpoints</h2>
 
     <div class="endpoint-box">
@@ -308,17 +342,20 @@ module.exports = auth;
         <p>Toggle device on/off status</p>
         <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
         <p><strong>Response:</strong></p>
-        <pre>{ "success": true, "device": {...} }</pre>
+        <pre>{ "success": true, "device": { "status": "on", ... } }</pre>
+        <p><strong>Note:</strong> Status returns <code>"on"</code> or <code>"off"</code> (not true/false)</p>
     </div>
 
     <div class="endpoint-box">
         <p><span class="method patch">PATCH</span><code>/api/devices/:id/ac-settings</code></p>
-        <p>Update AC temperature and mode</p>
+        <p>Update AC temperature and mode (AC must be ON)</p>
         <p><strong>Headers:</strong> <code>Authorization: &lt;jwt_token&gt;</code></p>
         <p><strong>Request Body:</strong></p>
         <pre>{ "temperature": 22, "mode": "cool" }</pre>
         <p><strong>Response:</strong></p>
         <pre>{ "success": true, "device": {...} }</pre>
+        <p><strong>Error (if AC is OFF):</strong></p>
+        <pre>{ "success": false, "message": "Turn on the AC first to change settings" }</pre>
     </div>
 
     <div class="endpoint-box">
@@ -465,6 +502,13 @@ router.get("/", auth, async (req, res) => {
 router.post("/", auth, async (req, res) => {
   try {
     const device = { ...req.body, user: req.userId };
+    
+    // Add temperature and mode only for AC devices
+    if (device.type === "ac") {
+      device.temperature = device.temperature || 24;
+      device.mode = device.mode || "cool";
+    }
+    
     const newDevice = await Device.create(device);
     res.status(201).send({ success: true, message: "Device created", device: newDevice });
   } catch (err) {
@@ -480,13 +524,13 @@ router.patch("/:id/toggle", auth, async (req, res) => {
       return res.status(404).send({ success: false, message: "Device not found" });
     }
 
-    device.status = !device.status;
+    device.status = device.status === "on" ? "off" : "on";
     await device.save();
 
     await Log.create({
       user: req.userId,
       device: device._id,
-      action: device.status ? "TURN_ON" : "TURN_OFF",
+      action: device.status === "on" ? "TURN_ON" : "TURN_OFF",
     });
 
     res.send({ success: true, device });
@@ -505,6 +549,10 @@ router.patch("/:id/ac-settings", auth, async (req, res) => {
 
     if (device.type !== "ac") {
       return res.status(400).send({ success: false, message: "This is not an AC device" });
+    }
+
+    if (device.status === "off") {
+      return res.status(400).send({ success: false, message: "Turn on the AC first to change settings" });
     }
 
     const { temperature, mode } = req.body;
