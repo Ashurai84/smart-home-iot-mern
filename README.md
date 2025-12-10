@@ -3,6 +3,15 @@
 A complete backend API for Smart Home Automation built with Node.js, Express, and MongoDB.
 
 
+
+## Documentation
+
+Full API and project documentation is available at:
+
+[https://ashurai84.github.io/Documentition-of-smarthome-iot/](https://ashurai84.github.io/Documentition-of-smarthome-iot/)
+
+---
+
 ## Live Deployment
 
 This API is deployed and running live on Render:
